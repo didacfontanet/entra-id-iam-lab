@@ -1,53 +1,20 @@
-# 🛡️ Didac — Cybersecurity Learning Journey (Blue Team / SOC Track)
+# Entra ID IAM Lab
 
-Bienvenido a mi repositorio de aprendizaje en ciberseguridad.  
-Aquí documento mi progreso, mis notas, ejercicios prácticos y proyectos centrados en defensa (Blue Team) y en el camino hacia SOC Analyst L1.
+Laboratorio práctico de Identity & Access Management sobre Microsoft Entra ID, construido en un tenant propio para practicar escenarios reales de administración de identidad, protección de acceso y automatización.
 
----
+## Contenido
 
-## 🎯 Objetivo
+| Módulo | Descripción | Estado |
+|---|---|---|
+| [01 · PIM](./01-pim) | Privileged Identity Management: acceso just-in-time a roles administrativos | ✅ |
+| [02 · Identity Protection](./02-identity-protection) | Políticas de riesgo de usuario y de sign-in | 🔜 |
+| [03 · Conditional Access](./03-conditional-access) | Políticas combinadas de acceso condicional | 🔜 |
+| [04 · AD ofensivo (GOAD)](./04-ad-attacks-goad) | Simulación de ataques a Active Directory y su mitigación | 🔜 |
+| [05 · Automatización](./05-automation-graph-api) | Scripts con Microsoft Graph API y PowerShell | 🔜 |
 
-Desarrollar una base sólida en ciberseguridad defensiva, mejorando mis habilidades en:
+## Contexto
 
-- Seguridad de redes  
-- Análisis de logs  
-- Respuesta a incidentes  
-- SIEM  
-- Linux  
-- Fundamentos de malware  
-- MITRE ATT&CK  
+IT & Security professional en ruta de certificación Microsoft (SC-900 → SC-300 → AZ-500). Este repo documenta el trabajo práctico que respalda esa ruta.
 
-Mi objetivo final es alcanzar el rol de **SOC Analyst Level 1**.
-
----
-
-## 📂 Estructura del repositorio
-
-- **/notes** → notas de cursos, apuntes técnicos y resúmenes importantes.  
-- **/tryhackme** → progreso, rooms completadas y objetivos de práctica.  
-- **/projects** → mini-proyectos y ejercicios prácticos (se irán añadiendo).  
-- **/labs** → laboratorios guiados y ejercicios defensivos (añadiré más adelante).
-
----
-
-## 🧩 Estado actual
-
-- Completado: *Cisco – Introduction to Cybersecurity*  
-- Configuración inicial del repositorio  
-- Inicio del camino **SOC Level 1** en TryHackMe  
-
----
-
-## 🚀 Próximos pasos
-
-- Completar las rooms iniciales de defensa en TryHackMe  
-- Crear el primer proyecto defensivo (análisis de logs + detección básica)  
-- Añadir notas técnicas de Linux, redes y seguridad  
-
----
-
-## 📬 Contacto
-
-Si quieres conectar conmigo:  
-👉 **LinkedIn**: https://www.linkedin.com/in/didac-sf/
-
+Portfolio: [didac-sf-portfolio.netlify.app](https://didac-sf-portfolio.netlify.app/)
+LinkedIn: [linkedin.com/in/didac-sf](https://www.linkedin.com/in/didac-sf/)
