@@ -1,3 +1,0 @@
-TryHackMe Username: didac.sanchez.fontanet
-Objetivo: Completar la ruta SOC Level 1 + fundamentos defensivos.
-
