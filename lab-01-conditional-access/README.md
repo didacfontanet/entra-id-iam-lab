@@ -14,7 +14,7 @@ Create and enforce a Conditional Access policy requiring MFA for all users, with
 | **Date completed** | 28 July 2026 |
 | **Time** | ~1.5 hours |
 
-![Tenant overview](./00-tenant-overview.png.png)
+![Tenant overview](./00-tenant-overview.png)
 
 ## Step 1 — Break-glass emergency account
 
