@@ -48,5 +48,5 @@ Most IAM candidates have certifications but no visible proof of hands-on work. T
 
 ## Connect
 
-- [LinkedIn](https://www.linkedin.com/in/didac-sanchez-fontanet/)
+- [LinkedIn](https://www.linkedin.com/in/didac-sf/)
 - [Portfolio](https://didac-sf-portfolio.netlify.app)
