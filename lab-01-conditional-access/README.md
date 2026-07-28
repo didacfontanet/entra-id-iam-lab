@@ -1,6 +1,3 @@
-Aquí lo tienes con las rutas corregidas (he quitado screenshots/ de las 10 imágenes). Selecciona todo en el editor de GitHub (Ctrl+A), borra, pega esto y commit fix: screenshot paths:
-
-markdown
 # Lab 01 — Conditional Access: MFA policy from scratch
 
 ## Objective
@@ -17,13 +14,14 @@ Create and enforce a Conditional Access policy requiring MFA for all users, with
 | **Date completed** | 28 July 2026 |
 | **Time** | ~1.5 hours |
 
-![Tenant overview](./00-tenant-overview.png)
+![Tenant overview](./00-tenant-overview.png.png)
 
 ## Step 1 — Break-glass emergency account
 
 Created `breakglass@DidacIAMLab.onmicrosoft.com` with **Global Administrator** assigned as a **permanent active assignment** (not PIM-eligible — an emergency account must never depend on an activation flow that could itself be broken).
 
 ![Break-glass account with permanent GA role](./01-breakglass-account.png)
+![Break-glass account overview](./01b-breakglass-overview.png)
 
 **Why this matters:** a misconfigured CA policy can lock every admin out of the tenant. The break-glass account, excluded from all CA policies, is the guaranteed way back in. Microsoft recommends at least two of these in production, with sign-in alerting on both.
 
@@ -52,6 +50,7 @@ Created `breakglass@DidacIAMLab.onmicrosoft.com` with **Global Administrator** a
 
 ![Policy configuration](./03a-ca-policy-config.png)
 ![Grant control — require MFA](./03b-ca-policy-config.png)
+![Policy summary before creation](./03c-ca-policy-config.png)
 
 **Design decisions:**
 - **Report-only first.** The policy logs what *would* happen without enforcing anything — the standard safe rollout in production.
