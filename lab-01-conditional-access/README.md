@@ -1,3 +1,6 @@
+Aquí lo tienes con las rutas corregidas (he quitado screenshots/ de las 10 imágenes). Selecciona todo en el editor de GitHub (Ctrl+A), borra, pega esto y commit fix: screenshot paths:
+
+markdown
 # Lab 01 — Conditional Access: MFA policy from scratch
 
 ## Objective
@@ -14,13 +17,13 @@ Create and enforce a Conditional Access policy requiring MFA for all users, with
 | **Date completed** | 28 July 2026 |
 | **Time** | ~1.5 hours |
 
-![Tenant overview](./screenshots/00-tenant-overview.png)
+![Tenant overview](./00-tenant-overview.png)
 
 ## Step 1 — Break-glass emergency account
 
 Created `breakglass@DidacIAMLab.onmicrosoft.com` with **Global Administrator** assigned as a **permanent active assignment** (not PIM-eligible — an emergency account must never depend on an activation flow that could itself be broken).
 
-![Break-glass account with permanent GA role](./screenshots/01-breakglass-account.png)
+![Break-glass account with permanent GA role](./01-breakglass-account.png)
 
 **Why this matters:** a misconfigured CA policy can lock every admin out of the tenant. The break-glass account, excluded from all CA policies, is the guaranteed way back in. Microsoft recommends at least two of these in production, with sign-in alerting on both.
 
@@ -31,7 +34,7 @@ Created `breakglass@DidacIAMLab.onmicrosoft.com` with **Global Administrator** a
 | SG-CA-Excluded | Security | breakglass | Excluded from all CA policies |
 | SG-AllUsers | Security | testpim | Standard users subject to policies |
 
-![Security groups](./screenshots/02-groups.png)
+![Security groups](./02-groups.png)
 
 **Design decision:** the policy excludes the *group*, not the individual account. Future emergency accounts only need to be added to SG-CA-Excluded — no policy edits required.
 
@@ -47,8 +50,8 @@ Created `breakglass@DidacIAMLab.onmicrosoft.com` with **Global Administrator** a
 | Grant | Require multifactor authentication |
 | Initial state | **Report-only** |
 
-![Policy configuration](./screenshots/03a-ca-policy-config.png)
-![Grant control — require MFA](./screenshots/03b-ca-policy-config.png)
+![Policy configuration](./03a-ca-policy-config.png)
+![Grant control — require MFA](./03b-ca-policy-config.png)
 
 **Design decisions:**
 - **Report-only first.** The policy logs what *would* happen without enforcing anything — the standard safe rollout in production.
@@ -61,13 +64,13 @@ The tenant had **Security Defaults** enabled, which blocks Conditional Access. D
 
 This mirrors the real migration path every organization follows: Security Defaults (baseline, no granularity) → Conditional Access (granular, policy-based). Note: deactivation takes a few minutes to propagate — breakglass briefly saw a leftover Security Defaults MFA registration prompt after disabling.
 
-![Policy created in report-only](./screenshots/04-ca-policy-created.png)
+![Policy created in report-only](./04-ca-policy-created.png)
 
 ## Step 4 — Report-only validation
 
 Signed in as `testpim` from an incognito session, then checked **Sign-in logs → Report-only** tab for that sign-in:
 
-![Report-only evaluation in sign-in logs](./screenshots/05-signin-reportonly.png)
+![Report-only evaluation in sign-in logs](./05-signin-reportonly.png)
 
 Result: `CA-001` evaluated with **"Report-only: User action required"** — meaning the policy *would have* demanded MFA. Exactly the expected outcome.
 
@@ -77,17 +80,17 @@ Result: `CA-001` evaluated with **"Report-only: User action required"** — mean
 
 Switched CA-001 from Report-only to **On**.
 
-![Policy enforced](./screenshots/06-ca-policy-on.png)
+![Policy enforced](./06-ca-policy-on.png)
 
 ## Step 6 — End-to-end testing
 
 **Test A — standard user (testpim):** sign-in now triggers MFA with number matching via Microsoft Authenticator:
 
-![MFA required with number matching](./screenshots/07-testpim-mfa-required.png)
+![MFA required with number matching](./07-testpim-mfa-required.png)
 
 **Test B — break-glass account:** signs in directly, no MFA challenge — the group exclusion works:
 
-![Break-glass signs in without MFA](./screenshots/08-breakglass-no-mfa.png)
+![Break-glass signs in without MFA](./08-breakglass-no-mfa.png)
 
 | Account | Expected | Result |
 |---------|----------|--------|
