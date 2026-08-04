@@ -76,7 +76,7 @@ The decision helper worked: the system automatically recommended Approve because
 
 **Review overview — progress dashboard:**
 
-![Review overview](./07-review-overview.png)
+![Review overview](./05-review-overview.png)
 
 ## Step 4 — Completing the review (reviewer experience)
 
