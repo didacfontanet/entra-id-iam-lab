@@ -46,7 +46,7 @@ Password reset → Authentication methods:
 
 Password reset → Registration: confirmed "Require users to register when signing in" = Yes.
 
-![Registration settings](./03-registration.png)
+![Registration settings](./03-sspr-failed.png)
 
 ## Step 4 — Troubleshooting: "insufficient authentication methods"
 
@@ -78,7 +78,7 @@ Second verification completed via Microsoft Authenticator app code.
 
 Both verification steps passed (✓ ✓), user set a new password:
 
-![New password screen](./06-sspr-complete.png)
+![New password screen](./06-sspr-newpassword.png)
 
 **Password reset confirmed:**
 
