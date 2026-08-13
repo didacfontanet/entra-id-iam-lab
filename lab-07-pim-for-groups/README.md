@@ -49,8 +49,6 @@ Navigated to **Identity Governance → Privileged Identity Management → Groups
 
 The group was automatically onboarded into PIM — the Eligible/Active/Expired assignments tabs became available immediately. The audit log registered an "Onboarded resource to PIM" event at this point.
 
-![PIM groups onboard]()
-
 ---
 
 ### 3. Create eligible assignment
