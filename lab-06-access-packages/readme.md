@@ -95,7 +95,8 @@ This is where the governance actually happens. Defined who can request access an
 | Require approver justification | Yes |
 | Decision deadline | 14 days |
 
-![Request policy approval](06-request-policy-approval.png)
+![Request policy approval](06a-request-policy-approval.png)
+![Request policy approval](06b-request-policy-approval.png)
 
 ---
 
