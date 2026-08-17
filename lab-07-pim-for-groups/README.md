@@ -61,8 +61,6 @@ Went to **Identity Governance → Privileged Identity Management → Groups** an
 
 The group was onboarded into PIM automatically. The Eligible / Active / Expired assignment tabs became available straight away, and the audit log recorded an "Onboarded resource to PIM" event at that moment.
 
-![PIM groups onboard](02-pim-groups-onboard.png)
-
 ---
 
 ### 3. Create eligible assignment
@@ -78,7 +76,9 @@ From **Assignments → + Add assignments**:
 
 Eligible means the user can *request* activation. They are not a member of the group until they do it and get approved.
 
-![Eligible assignment](03-eligible-assignment.png)
+![Eligible assignment](03a-eligible-assignment.png)
+![Eligible assignment](03b-eligible-assignment.png)
+
 
 ---
 
