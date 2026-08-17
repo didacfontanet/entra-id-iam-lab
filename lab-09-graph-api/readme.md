@@ -2,9 +2,9 @@
 
 ## Objective
 
-Query Microsoft Entra ID programmatically using the Microsoft Graph API via Graph Explorer. Demonstrate how identity data (users, groups, memberships) can be retrieved and filtered through API calls rather than portal clicks — the foundation of IAM automation. Understand permission scopes, consent flows, and OData query parameters.
+Query Microsoft Entra ID programmatically through the Microsoft Graph API. Retrieve users, groups and group membership using REST calls and OData parameters instead of clicking through the portal, and understand how permission scopes and consent control what the API will return.
 
-**Zero Trust principle applied:** Verify explicitly — every API call must be authenticated and authorized with explicit permission scopes. No data is accessible without a valid token and consented permissions, regardless of the caller's identity.
+**Zero Trust principle applied:** Verify explicitly. Every API call has to carry a valid token and consented scopes. Being a Global Admin in the tenant doesn't grant access to the data by itself.
 
 ---
 
@@ -18,7 +18,7 @@ Query Microsoft Entra ID programmatically using the Microsoft Graph API via Grap
 | Tool | Microsoft Graph Explorer — developer.microsoft.com/graph/graph-explorer |
 | API version | v1.0 |
 
-> **Note:** Graph Explorer was used instead of PowerShell + Microsoft.Graph module due to restrictions on the work laptop. Graph Explorer provides identical API access through the browser — same endpoints, same tokens, same responses. In production environments, these queries would be scripted in PowerShell or Python for automation.
+**On the tooling:** I originally planned to do this with PowerShell and the `Microsoft.Graph` module. `Install-Module` is blocked on my work laptop, and Azure Cloud Shell turned out to need a linked Azure subscription which this tenant doesn't have. Graph Explorer solved it: it's the same REST API, the same tokens and the same responses, just a different client. The PowerShell equivalents are included at the end for reference.
 
 ---
 
@@ -38,13 +38,11 @@ Query Microsoft Entra ID programmatically using the Microsoft Graph API via Grap
 
 ### 1. Get signed-in user profile — GET /me
 
-First query: retrieve the profile of the currently authenticated user.
-
 ```http
 GET https://graph.microsoft.com/v1.0/me
 ```
 
-Response confirmed the admin identity with all standard user properties: `displayName`, `userPrincipalName`, `mail`, `id`, `preferredLanguage`.
+Returned the profile of the currently authenticated account with the standard user properties: `displayName`, `userPrincipalName`, `mail`, `id`, `preferredLanguage`.
 
 ![Graph GET me](01-graph-get-me.png)
 
@@ -56,16 +54,13 @@ Response confirmed the admin identity with all standard user properties: `displa
 GET https://graph.microsoft.com/v1.0/users
 ```
 
-**Troubleshooting — 403 Forbidden on first attempt:**
-Initial call returned `Authorization_RequestDenied` — Graph Explorer did not have the `User.ReadBasic.All` permission consented for this session.
+**403 Forbidden on the first attempt.** The call returned `Authorization_RequestDenied` because Graph Explorer didn't have `User.ReadBasic.All` consented.
 
-Resolution: navigated to **Modify permissions** tab → found `User.ReadBasic.All` → clicked **Consent** → accepted the permission prompt. Re-ran the query successfully.
-
-This error demonstrates a key concept: having admin rights in the tenant does not automatically grant Graph API permissions in a client application. Each app (including Graph Explorer) must explicitly consent to the scopes it needs.
+Fixed it from the **Modify permissions** tab: found `User.ReadBasic.All`, clicked **Consent**, accepted the prompt, and re-ran the query.
 
 ![Graph 403 insufficient privileges](02b-graph-403-insufficient-privileges.png)
 
-After consent, the query returned all 3 tenant users:
+After consent the query returned all 3 tenant users:
 
 | User | UPN | Object ID |
 |---|---|---|
@@ -83,14 +78,13 @@ After consent, the query returned all 3 tenant users:
 GET https://graph.microsoft.com/v1.0/groups
 ```
 
-**Troubleshooting — 403 Forbidden on first attempt:**
-Same pattern as /users — `Group.Read.All` required a separate consent in Graph Explorer even though it had been granted tenant-wide on the `IAM-Lab-WebApp` registration in Lab 08. Graph Explorer is a different application with its own permission grants.
+**403 again, same pattern.** `Group.Read.All` needed its own consent in Graph Explorer, even though I had already granted that exact scope tenant-wide on the `IAM-Lab-WebApp` registration back in Lab 08. Graph Explorer is a different application with its own permission grants.
 
-Resolution: **Modify permissions** → `Group.Read.All` → **Consent**.
+Fixed the same way: **Modify permissions → Group.Read.All → Consent**.
 
 ![Graph groups 403](03b-graph-groups-403.png)
 
-After consent, the query returned all 7 tenant groups:
+The query then returned all 7 tenant groups:
 
 | Group | Type | Purpose |
 |---|---|---|
@@ -112,11 +106,10 @@ After consent, the query returned all 7 tenant groups:
 GET https://graph.microsoft.com/v1.0/users?$select=displayName,userPrincipalName,id&$orderby=displayName
 ```
 
-Used OData query parameters to return only the fields needed, sorted alphabetically:
-- `$select` — limits the properties returned (reduces payload, improves performance)
-- `$orderby` — sorts results by displayName ascending
+- `$select` limits which properties come back, which cuts the payload down
+- `$orderby` sorts the results server-side
 
-This is the pattern used in production scripts — never return full objects when you only need specific fields.
+This is how you'd write it in a script. Returning full objects when you only need three fields wastes bandwidth and hits throttling limits faster.
 
 ![Graph select orderby](04-graph-select-orderby.png)
 
@@ -128,22 +121,22 @@ This is the pattern used in production scripts — never return full objects whe
 GET https://graph.microsoft.com/v1.0/groups/f61f9cd9-b880-4159-a781-89d0d212d9be/members
 ```
 
-Used the Object ID of `SG-Finance-App-Access` (retrieved from the /groups response in step 3) to query its current members programmatically.
+Took the Object ID of `SG-Finance-App-Access` from the /groups response in step 3 and used it to query the group's members.
 
-Response confirmed **Test PIM User** (`testpim@DidacIAMLab.onmicrosoft.com`) as a member — the same membership that was auto-provisioned by the Access Package approval flow in Lab 06, now visible via API.
+The response confirmed **Test PIM User** as a member. That's the same membership the Access Package provisioned automatically in Lab 06, now visible through the API instead of the portal.
 
-This demonstrates the full circle: access was requested via myaccess portal → approved → provisioned automatically → now verifiable programmatically via Graph API.
+Full circle: access requested through myaccess, approved, provisioned automatically, and verifiable programmatically.
 
 ![Graph group members](05-graph-group-members.png)
 
 ---
 
-## Equivalent PowerShell Commands
+## PowerShell Equivalents (reference — not executed in this lab)
 
-These are the PowerShell equivalents of the Graph Explorer queries above. They would be run with the `Microsoft.Graph` module connected via `Connect-MgGraph -Scopes "User.Read.All","Group.Read.All"`:
+These are the commands I'd use for the same queries with the `Microsoft.Graph` module, connected via `Connect-MgGraph -Scopes "User.Read.All","Group.Read.All"`. Included as reference since the module install was blocked on my machine.
 
 ```powershell
-# 1. Get signed-in user profile
+# 1. Current session context
 Get-MgContext
 
 # 2. List all users
@@ -157,7 +150,7 @@ Get-MgUser -All -Property DisplayName, UserPrincipalName, Id |
     Select-Object DisplayName, UserPrincipalName, Id |
     Sort-Object DisplayName
 
-# 5. Get members of a specific group
+# 5. Members of a specific group
 Get-MgGroupMember -GroupId "f61f9cd9-b880-4159-a781-89d0d212d9be" |
     ForEach-Object {
         Get-MgUser -UserId $_.Id | Select-Object DisplayName, UserPrincipalName
@@ -168,29 +161,34 @@ Get-MgGroupMember -GroupId "f61f9cd9-b880-4159-a781-89d0d212d9be" |
 
 ## Design Decisions
 
-**Why Graph Explorer instead of PowerShell?**
-The work laptop had restrictions preventing `Install-Module` from PSGallery. Graph Explorer provides identical REST API access through the browser — same Microsoft identity platform, same tokens, same endpoints. The underlying HTTP calls are what matter conceptually, not the client tool used to make them. In a production automation context, these would be scripted in PowerShell or Python.
-
-**Why use v1.0 instead of beta?**
-The v1.0 endpoint contains only stable, GA features with Microsoft's backwards compatibility guarantee. The beta endpoint has more features but breaking changes can happen without notice. For production scripts and lab documentation, v1.0 is always the correct choice unless a specific feature is only available in beta.
+**Why v1.0 instead of beta?**
+v1.0 only contains GA features and comes with a backwards compatibility guarantee. The beta endpoint has more features but breaking changes can land without notice. For anything you'd script against, v1.0 is the right default unless the feature you need only exists in beta.
 
 **Why query group members by Object ID instead of displayName?**
-Object IDs are immutable — they never change even if the group is renamed. DisplayNames can be edited. Any script or automation that references a group by name will break silently if the group is renamed. Always use Object IDs in scripts and API calls.
+Object IDs never change. Display names get edited. A script that looks up a group by name breaks silently the day someone renames it, and it's a hard failure to trace.
 
-**Why are the 403 errors documented instead of hidden?**
-The permission consent flow is one of the most misunderstood aspects of Graph API in real environments. Many junior admins assume that being a Global Admin grants automatic access to all API calls — it does not. Each application must be explicitly granted the scopes it needs through consent. Documenting this error demonstrates understanding of the OAuth2 consent model, not a mistake.
+**Why document the 403 errors instead of just showing working queries?**
+The consent model is the part of Graph that catches people out. It's easy to assume Global Admin means access to everything, and it doesn't. Showing the error and the fix is more useful than showing five green 200s.
 
 ---
 
 ## Lessons Learned
 
-**Tenant-wide admin consent on an app registration does not carry over to other apps.** In Lab 08, `Group.Read.All` was granted on `IAM-Lab-WebApp`. Graph Explorer is a separate app registration — it required its own consent grant. This is correct behavior: each application has its own permission grants, isolated from other apps.
+**Tenant-wide admin consent doesn't carry across applications.** I'd granted `Group.Read.All` on `IAM-Lab-WebApp` in Lab 08, so when Graph Explorer threw a 403 on the same scope I assumed something had gone wrong. It hadn't. Each app registration holds its own permission grants, and Graph Explorer is just another registered app in the tenant. Once that clicked it made complete sense, but it wasn't obvious in the moment.
 
-**OData query parameters drastically reduce payload size.** The full `/users` response includes ~20 properties per user. Using `$select=displayName,userPrincipalName,id` reduces this to 3 — for tenants with thousands of users, this is the difference between a fast script and one that times out or hits throttling limits.
+I also lost a couple of minutes on something much dumber: I pasted `GET https://graph.microsoft.com/v1.0/groups` into the URL field including the word GET, and got "Failed to construct URL: Invalid URL". The method goes in the dropdown, not the URL.
 
-**Object IDs from one query can be chained into the next.** The `/groups` response returned the Object ID of `SG-Finance-App-Access`, which was immediately used in the `/groups/{id}/members` query. This chaining pattern is fundamental to Graph API scripting — retrieve IDs first, then use them in subsequent calls.
+**Chaining IDs between calls is the basic pattern.** The `/groups` response gave me the Object ID for `SG-Finance-App-Access`, which went straight into the next call to list its members. Almost everything you do with Graph works this way: get a collection, pull the ID you need, use it in the next request. Once you see it, scripting against Graph stops looking complicated.
 
-**Labs connect across each other.** The group member returned in step 5 was provisioned by the Access Package in Lab 06. Seeing the same data through a different lens (portal vs API) reinforces understanding of what Entra ID is actually doing under the hood.
+**Seeing Lab 06's result through the API changed how I understood it.** The membership I'd watched appear in the portal after the access package approval was just a row of JSON here. Same object, same directory, different lens. It made the relationship between the governance layer and the directory itself much more concrete than reading about it did.
+
+---
+
+## What I'd Do Differently
+
+I'd set the `Microsoft.Graph` module up on my personal machine and re-run all five queries in PowerShell, then compare the output. Graph Explorer is fine for learning the API, but real IAM automation is scripted, scheduled and version-controlled, and I want the reps writing it rather than clicking it.
+
+I'd also try `$filter` properly. I used `$select` and `$orderby`, but `$filter` is where most of the useful work happens (finding accounts that haven't signed in, users missing MFA registration, guests older than X days) and I didn't touch it.
 
 ---
 
@@ -198,14 +196,14 @@ The permission consent flow is one of the most misunderstood aspects of Graph AP
 
 | Concept | Description |
 |---|---|
-| **Microsoft Graph API** | Unified REST API for accessing all Microsoft 365 and Entra ID data — users, groups, devices, mail, calendar, and more |
-| **Graph Explorer** | Browser-based tool for testing Graph API queries with your own tenant data |
-| **Permission scope** | A named permission that grants access to a specific resource (e.g. `User.Read.All`, `Group.Read.All`) |
-| **Delegated permission** | API access on behalf of a signed-in user — bounded by the user's own permissions |
-| **Consent** | The act of a user or admin explicitly granting an app access to specific scopes |
-| **OData $select** | Returns only specified properties — reduces payload and improves performance |
-| **OData $filter** | Filters results server-side — e.g. `$filter=displayName eq 'Test PIM User'` |
-| **OData $orderby** | Sorts results — e.g. `$orderby=displayName asc` |
-| **Object ID** | Immutable GUID that uniquely identifies any Entra ID object — always use this in scripts, never displayName |
-| **Bearer token** | The access token included in every Graph API request as `Authorization: Bearer {token}` |
-| **v1.0 vs beta** | v1.0 = stable GA features with backwards compatibility; beta = preview features, may break without notice |
+| **Microsoft Graph API** | Unified REST API for Microsoft 365 and Entra ID data: users, groups, devices, mail, calendar |
+| **Graph Explorer** | Browser-based tool for testing Graph queries against your own tenant |
+| **Permission scope** | Named permission granting access to a specific resource, e.g. `Group.Read.All` |
+| **Delegated permission** | API access on behalf of a signed-in user, bounded by that user's permissions |
+| **Consent** | A user or admin explicitly granting an app access to specific scopes |
+| **OData $select** | Returns only the properties you ask for |
+| **OData $filter** | Filters results server-side, e.g. `$filter=displayName eq 'Test PIM User'` |
+| **OData $orderby** | Sorts results, e.g. `$orderby=displayName asc` |
+| **Object ID** | Immutable GUID identifying an Entra ID object, what scripts should always reference |
+| **Bearer token** | Access token sent as `Authorization: Bearer {token}` on every Graph request |
+| **v1.0 vs beta** | v1.0 is GA with compatibility guarantees, beta is preview and can break without notice |
