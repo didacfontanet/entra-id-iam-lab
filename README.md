@@ -25,7 +25,7 @@ Hands-on IAM labs built in a dedicated Microsoft Entra ID tenant, documenting re
 | 01 | [Conditional Access — MFA policy from scratch](lab-01-conditional-access/) | ✅ Complete | CA policies, MFA, break-glass account, report-only → on, Zero Trust |
 | 02 | [Privileged Identity Management (PIM)](lab-02-pim/) | ✅ Complete | Just-in-time access, eligible roles, approval workflow, audit logs |
 | 03 | [Identity Protection & risky sign-ins](lab-03-identity-protection/) | ✅ Complete | Sign-in risk, user risk, Tor simulation, risk-based CA policies |
-| 04 | [SSPR & authentication methods](lab-04-sspr/) | ✅ Complete | Self-service password reset, MFA methods, authentication methods policy |
+| 04 | [SSPR & authentication methods](lab-04-sspr/) | ✅ Complete | | ✅ Complete | Self-service password reset, MFA methods, authentication methods policy |
 | 05 | [Access Reviews](lab-05-access-reviews/) | ✅ Complete | Periodic governance, decision helpers, auto-apply, identity governance |
 | 06 | [Access Packages (Entitlement Management)](lab-06-access-packages/) | ✅ Complete | Catalogs, access packages, request/approval workflow, auto-provisioning, time-bound access |
 | 07 | [PIM for Groups](lab-07-pim-for-groups/) | ✅ Complete | Just-in-time group membership, role-assignable groups, activation workflow |
