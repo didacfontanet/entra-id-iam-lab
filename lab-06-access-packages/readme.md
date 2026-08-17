@@ -2,9 +2,9 @@
 
 ## Objective
 
-Configure an end-to-end entitlement management workflow using Microsoft Entra ID Access Packages. Demonstrate how users can self-request access to resources through a governed catalog, with mandatory approval, automatic provisioning, and time-bound expiration — eliminating manual IT intervention.
+Configure an end-to-end entitlement management workflow using Microsoft Entra ID Access Packages. Show how users can request access to resources themselves through a governed catalog, with approval, automatic provisioning, and time-bound expiration, so IT doesn't have to grant every permission by hand.
 
-**Zero Trust principle applied:** Verify explicitly + Least privilege access — users receive only the access they request, only for the time they need it, through a documented and auditable approval chain.
+**Zero Trust principle applied:** Verify explicitly + Least privilege access. Users get only the access they ask for, only for the time they need it, through an approval chain that leaves a record.
 
 ---
 
@@ -27,7 +27,7 @@ Configure an end-to-end entitlement management workflow using Microsoft Entra ID
 | Resource group | SG-Finance-App-Access | Security group representing a finance application resource |
 | Catalog | IAM-Lab-Catalog | Container for access packages and their resources |
 | Access Package | AP-Finance-Access | Requestable bundle of access to finance resources |
-| Policy | Initial Policy | Defines who can request, approval flow, and expiration |
+| Policy | Initial Policy | Defines who can request, the approval flow, and expiration |
 
 ---
 
@@ -35,7 +35,7 @@ Configure an end-to-end entitlement management workflow using Microsoft Entra ID
 
 ### 1. Create resource group
 
-Created security group `SG-Finance-App-Access` (Assigned membership, no initial members) to serve as the resource that will be governed by the access package.
+Created security group `SG-Finance-App-Access` (Assigned membership, no initial members) to act as the resource governed by the access package.
 
 ![Resource group created](01-resource-group-created.png)
 
@@ -54,7 +54,7 @@ Created `IAM-Lab-Catalog` under Identity Governance → Entitlement management �
 
 ### 3. Add resource to catalog
 
-Added `SG-Finance-App-Access` as a resource inside `IAM-Lab-Catalog` via the Resources tab.
+Added `SG-Finance-App-Access` as a resource inside `IAM-Lab-Catalog` from the Resources tab.
 
 ![Catalog resources](03-catalog-resources.png)
 
@@ -74,7 +74,7 @@ Created `AP-Finance-Access` inside `IAM-Lab-Catalog`.
 
 ### 5. Configure resource roles
 
-Linked `SG-Finance-App-Access` to the access package with role **Member** — meaning approved users get added to the group automatically.
+Linked `SG-Finance-App-Access` to the access package with role **Member**, so approved users get added to the group automatically.
 
 ![Resource roles](05-resource-roles.png)
 
@@ -82,12 +82,12 @@ Linked `SG-Finance-App-Access` to the access package with role **Member** — me
 
 ### 6. Configure request policy
 
-Defined who can request access and the approval chain:
+This is where the governance actually happens. Defined who can request access and how it gets approved:
 
 | Setting | Value |
 |---|---|
 | Who can request | SG-AllUsers (specific group in directory) |
-| Who can request (self) | Self (enabled) |
+| Self-service enabled | Yes |
 | Require approval | Yes |
 | Approval stages | 1 |
 | First approver | DidacSanchez |
@@ -95,14 +95,13 @@ Defined who can request access and the approval chain:
 | Require approver justification | Yes |
 | Decision deadline | 14 days |
 
-![Request policy approval](06a-request-policy-approval.png)
-![Request policy approval](06b-request-policy-approval.png)
+![Request policy approval](06-request-policy-approval.png)
 
 ---
 
 ### 7. Configure lifecycle
 
-Set automatic expiration to enforce time-bound access:
+Set automatic expiration so access doesn't become permanent:
 
 | Setting | Value |
 |---|---|
@@ -127,11 +126,11 @@ Set automatic expiration to enforce time-bound access:
 
 ### 9. End-user request via myaccess.microsoft.com
 
-Logged in as `testpim` in a private browser session. Navigated to **myaccess.microsoft.com → Access packages → AP-Finance-Access → Request**.
+Logged in as `testpim` in a private browser session. Went to **myaccess.microsoft.com → Access packages → AP-Finance-Access → Request**.
 
-Submitted business justification: *"Need access to finance resources for Q3 reporting"*
+Business justification submitted: *"Need access to finance resources for Q3 reporting"*
 
-Request entered pending approval state immediately.
+The request went straight into pending approval.
 
 ![MyAccess request from testpim](09-myaccess-request-testpim.png)
 
@@ -139,9 +138,9 @@ Request entered pending approval state immediately.
 
 ### 10. Admin approval
 
-Logged in as `DidacSanchez` → **myaccess.microsoft.com → Approvals → Pending**.
+Logged back in as `DidacSanchez` and went to **myaccess.microsoft.com → Approvals → Pending**.
 
-Reviewed request from Test PIM User, selected **Approve**, and provided justification: *"Approved for Q3 finance project access"*
+Reviewed the request from Test PIM User, selected **Approve**, and added the justification: *"Approved for Q3 finance project access"*
 
 ![Approval granted](10-approval-granted.png)
 
@@ -149,9 +148,9 @@ Reviewed request from Test PIM User, selected **Approve**, and provided justific
 
 ### 11. Automatic group provisioning verified
 
-Navigated to **Groups → SG-Finance-App-Access → Members**.
+Went to **Groups → SG-Finance-App-Access → Members**.
 
-Test PIM User appeared as a direct member within seconds of approval — no manual IT action required.
+Test PIM User showed up as a direct member right after the approval, with no manual step from IT.
 
 ![Auto-provisioned membership](11-auto-provisioned-membership.png)
 
@@ -159,12 +158,12 @@ Test PIM User appeared as a direct member within seconds of approval — no manu
 
 ### 12. Assignment with expiration date confirmed
 
-Navigated to **AP-Finance-Access → Assignments**.
+Went to **AP-Finance-Access → Assignments**.
 
-Assignment visible with:
+The assignment was there with:
 - Status: **Delivered**
 - End date: **September 12, 2026** (30 days from assignment)
-- Access will be automatically revoked on that date
+- Access gets revoked on that date without anyone doing anything
 
 ![Assignment with expiry](12-assignment-with-expiry.png)
 
@@ -172,27 +171,35 @@ Assignment visible with:
 
 ## Design Decisions
 
-**Why a dedicated catalog instead of using the built-in General catalog?**
-Catalogs are the governance boundary in Entitlement Management — separate catalogs allow different ownership, delegation, and policy per department or application domain. Using a dedicated catalog demonstrates understanding of multi-team governance, not just the default path.
+**Why a dedicated catalog instead of the built-in General catalog?**
+Catalogs are the governance boundary in Entitlement Management. Separate catalogs let you delegate ownership and apply different policies per department or application. Using the default General catalog would work for a single lab, but it doesn't reflect how this gets organised once more than one team is involved.
 
 **Why SG-AllUsers as requestable scope instead of All members?**
-Scoping to a specific group rather than all directory members follows least privilege at the policy level — only users who belong to SG-AllUsers can see and request this package. In production this would be scoped to the relevant department or team.
+Scoping to a specific group applies least privilege at the policy level: only users in SG-AllUsers can even see this package. In a real environment this would be scoped to the department that actually needs it, not to everyone in the directory.
 
 **Why 30-day expiration instead of permanent access?**
-Time-bound access is a core Zero Trust control. Permanent access accumulates over time and creates orphaned permissions. A 30-day window forces periodic revalidation — users who still need access must request an extension (also requiring approval), creating an automatic audit trail.
+Permanent access piles up over time and nobody notices. A 30-day window forces revalidation. If the user still needs it, they request an extension, which also goes through approval, so the renewal is recorded too.
 
 **Why require both requestor and approver justification?**
-Dual justification creates an auditable record on both sides. In an audit or security review, you can trace not just who approved access but why it was requested and why it was granted — this is the difference between a rubber-stamp approval process and governed access.
+With both sides recorded, an audit can trace not just who approved something but why it was asked for and why it was granted. Without it you end up with approvals nobody actually reviewed.
 
 ---
 
 ## Lessons Learned
 
-**Self checkbox must be explicitly enabled.** In the Requests policy, the "Who can request access" section has a separate "Self" checkbox that is not selected by default. Without enabling it, end users cannot request access themselves — only admins can assign directly. This is a common misconfiguration in production environments.
+The "Self" checkbox is easy to miss. In the Requests policy there is a "Who can request access" section with separate checkboxes for Self, Admin and Manager. Admin is ticked by default and can't be turned off, so at first glance the section looks configured. But if you don't tick Self, the end user can't request anything, only an admin can assign it directly. I set up the whole policy, went to test it as testpim, and had to go back and fix this.
 
-**Propagation delay is expected in trial tenants.** Group membership after approval appeared almost immediately in this lab (~30 seconds), but the portal documentation warns of up to 15 minutes in production tenants. This is normal Azure AD replication behavior and not an error.
+**Provisioning was much faster than I expected.** I had read that group membership can take up to 15 minutes to appear after approval. In my tenant testpim showed up in the group in a few seconds. Either the docs are conservative or small trial tenants replicate faster, but it's worth knowing that both are normal so you don't start troubleshooting something that isn't broken.
 
-**The My Access portal link is tenant-specific.** The direct link (`https://myaccess.microsoft.com/@DidacIAMLab.onmicrosoft.com`) scopes the portal to the specific tenant, which is useful in multi-tenant environments where a user might belong to multiple directories.
+**The My Access link is tenant-specific.** The portal gives you a direct link that includes the tenant name (`myaccess.microsoft.com/@DidacIAMLab.onmicrosoft.com`). That matters for users who belong to more than one directory, because the generic link can drop them in the wrong tenant.
+
+---
+
+## What I'd Do Differently
+
+I only tested the happy path: request, approve, provision. I'd like to have also tested what happens when a request is **denied**, and the extension flow when the 30 days are close to expiring, since I configured extensions to require approval but never triggered one.
+
+I'd also set the decision deadline shorter than 14 days. Two weeks is the maximum the portal allows, but in a real environment a request sitting unanswered for two weeks means the user is blocked from doing their job.
 
 ---
 
@@ -200,11 +207,11 @@ Dual justification creates an auditable record on both sides. In an audit or sec
 
 | Concept | Description |
 |---|---|
-| **Entitlement Management** | Azure AD feature that automates access request, approval, and lifecycle for groups, apps, and SharePoint sites |
-| **Access Package** | A named bundle of resource roles that users can request as a unit |
-| **Catalog** | A governance container that groups access packages and their resources; supports delegated management |
-| **Policy** | Defines requestable scope, approval workflow, and lifecycle for an access package |
-| **Auto-provisioning** | Automatic group membership assignment upon access package approval, without IT intervention |
-| **Time-bound access** | Access that expires automatically after a defined period, enforcing least privilege over time |
-| **myaccess.microsoft.com** | The self-service portal where end users request, view, and manage their access packages |
-| **Separation of duties** | Access packages support SoD rules to prevent conflicting access combinations |
+| **Entitlement Management** | Entra ID feature that automates access request, approval and lifecycle for groups, apps and SharePoint sites |
+| **Access Package** | A named bundle of resource roles that users can request as one unit |
+| **Catalog** | Governance container that groups access packages and their resources, supports delegated management |
+| **Policy** | Defines requestable scope, approval workflow and lifecycle for an access package |
+| **Auto-provisioning** | Group membership assigned automatically on approval, without IT intervention |
+| **Time-bound access** | Access that expires by itself after a set period |
+| **myaccess.microsoft.com** | Self-service portal where users request, view and manage their access packages |
+| **Separation of duties** | Access packages support SoD rules to block conflicting access combinations |
